@@ -74,47 +74,42 @@ export class MarbleSolitaire {
   play(row: number, col: number): boolean {
     if (!this.isValidSpace(row, col)) return false;
 
-    if (this.selctedMarble !== EMPTY_MARBLE) {
-      const move = this.moves.find(
-        (move) => move.to.row === row && move.to.col === col,
-      );
-      if (move != null) {
-        // the selected space is a valid move so make the move
-        const playedMarble = this.board[move.from.row][move.from.col];
-        this.board[move.from.row][move.from.col] = EMPTY_SPACE;
-        this.board[move.target.row][move.target.col] = EMPTY_SPACE;
-        this.board[move.to.row][move.to.col] = playedMarble;
+    if (!this.marbleSelected()) {
+      if (this.board[row][col] === EMPTY_SPACE) return false;
 
-        // this turn is complete
+      const availableMoves = this.availableMoves(row, col);
+      if (availableMoves.length === 0) return false;
+
+      // set the selected marble
+      this.selctedMarble = { row, col };
+      this.moves = availableMoves;
+
+      return true;
+    } else {
+      if (this.selctedMarble.row === row && this.selctedMarble.col === col) {
+        // the same marble was selected so deselect it
         this.selctedMarble = EMPTY_MARBLE;
         this.moves = [];
         return true;
       }
-      return false;
-    }
 
-    if (this.board[row][col] === EMPTY_SPACE) return false;
+      const move = this.moves.find(
+        (move) => move.to.row === row && move.to.col === col,
+      );
 
-    this.moves = this.availableMoves(row, col);
-    if (this.moves.length === 0) {
-      // the marble must have available moves
-      this.moves = [];
-      return false;
-    }
+      if (move == null) return false;
 
-    if (this.selctedMarble === EMPTY_MARBLE) {
-      // not in the middle of a move so set the selected marble
-      this.selctedMarble = { row, col };
-      return true;
-    }
+      // the selected space is a valid move so make the move
+      const playedMarble = this.board[move.from.row][move.from.col];
+      this.board[move.from.row][move.from.col] = EMPTY_SPACE;
+      this.board[move.target.row][move.target.col] = EMPTY_SPACE;
+      this.board[move.to.row][move.to.col] = playedMarble;
 
-    if (this.selctedMarble.row === row && this.selctedMarble.col === col) {
-      // the same marble was selected so deselect it
+      // this turn is complete
       this.selctedMarble = EMPTY_MARBLE;
+      this.moves = [];
       return true;
     }
-
-    return false;
   }
 
   availableMoves(row: number, col: number): Move[] {
@@ -179,5 +174,9 @@ export class MarbleSolitaire {
       col < this.board[row].length &&
       this.board[row][col] !== -1
     );
+  }
+
+  marbleSelected(): boolean {
+    return this.selctedMarble !== EMPTY_MARBLE;
   }
 }
