@@ -36,25 +36,77 @@ describe("MarbleSolitaire", () => {
       const game = new MarbleSolitaire("European" as BoardType);
       game.board = [[0, 1, 2]];
       const moves = game.availableMoves(0, 2);
-      expect(moves).toEqual([{ row: 0, col: 0 }]);
+      expect(moves).toEqual([
+        {
+          from: { row: 0, col: 2 },
+          target: { row: 0, col: 1 },
+          to: { row: 0, col: 0 },
+        },
+      ]);
     });
     it("should return an available moves to the right of the given space", () => {
       const game = new MarbleSolitaire("European" as BoardType);
       game.board = [[1, 2, 0]];
       const moves = game.availableMoves(0, 0);
-      expect(moves).toEqual([{ row: 0, col: 2 }]);
+      expect(moves).toEqual([
+        {
+          from: { row: 0, col: 0 },
+          target: { row: 0, col: 1 },
+          to: { row: 0, col: 2 },
+        },
+      ]);
     });
     it("should return an available moves above the given space", () => {
       const game = new MarbleSolitaire("European" as BoardType);
       game.board = [[0], [1], [2]];
       const moves = game.availableMoves(2, 0);
-      expect(moves).toEqual([{ row: 0, col: 0 }]);
+      expect(moves).toEqual([
+        {
+          from: { row: 2, col: 0 },
+          target: { row: 1, col: 0 },
+          to: { row: 0, col: 0 },
+        },
+      ]);
     });
     it("should return an available moves below the given space", () => {
       const game = new MarbleSolitaire("European" as BoardType);
       game.board = [[2], [1], [0]];
       const moves = game.availableMoves(0, 0);
-      expect(moves).toEqual([{ row: 2, col: 0 }]);
+      expect(moves).toEqual([
+        {
+          from: { row: 0, col: 0 },
+          target: { row: 1, col: 0 },
+          to: { row: 2, col: 0 },
+        },
+      ]);
+    });
+  });
+  describe("play", () => {
+    it("should ignore spaces outside the board", () => {
+      const game = new MarbleSolitaire("European" as BoardType);
+      game.board = [
+        [-1, 1, 2, -1],
+        [3, 4, 5, 6],
+        [7, 8, 9, 10],
+        [-1, 11, 12, -1],
+      ];
+      expect(game.play(-1, 0)).toBe(false);
+      expect(game.play(4, 0)).toBe(false);
+      expect(game.play(0, -1)).toBe(false);
+      expect(game.play(0, 4)).toBe(false);
+    });
+    it("should ignore invalid spaces", () => {
+      const game = new MarbleSolitaire("European" as BoardType);
+      game.board = [
+        [-1, 1, 2, -1],
+        [3, 4, 5, 6],
+        [7, 8, 9, 10],
+        [-1, 11, 12, -1],
+      ];
+      expect(game.play(0, 0)).toBe(false);
+      expect(game.play(0, 3)).toBe(false);
+      expect(game.play(3, 0)).toBe(false);
+      expect(game.play(3, 3)).toBe(false);
     });
   });
 });

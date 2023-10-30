@@ -1,10 +1,17 @@
 export type BoardType = "English" | "European";
 
 const EMPTY_MARBLE = { row: -1, col: -1 };
+const EMPTY_SPACE = 0;
 
 export interface Coordinate {
   row: number;
   col: number;
+}
+
+export interface Move {
+  from: Coordinate;
+  target: Coordinate;
+  to: Coordinate;
 }
 
 export class MarbleSolitaire {
@@ -12,7 +19,7 @@ export class MarbleSolitaire {
   board: number[][] = [];
   size: number = 7;
   selctedMarble: Coordinate = EMPTY_MARBLE;
-  moves: Coordinate[] = [];
+  moves: Move[] = [];
 
   static europeanBoardTemplate = `
     - - a b c - -
@@ -42,7 +49,6 @@ export class MarbleSolitaire {
   // represents no space (-1), letters represent a space with a marble (>0), though an 'x'
   // represents an empty space (0).
   initBoard(): void {
-    let id = 1;
     const template =
       this.type === "English"
         ? MarbleSolitaire.englishBoardTemplate
@@ -51,6 +57,7 @@ export class MarbleSolitaire {
       .trim()
       .split("\n")
       .map((row) => row.trim().split(" "));
+    let id = 1;
     this.board = board.map((row) =>
       row.map((space) => {
         if (space === "-") {
@@ -65,21 +72,53 @@ export class MarbleSolitaire {
   }
 
   play(row: number, col: number): boolean {
-    // the space must have a marble to be played
-    if (this.board[row][col] === 0) return false;
+    if (!this.isValidSpace(row, col)) return false;
 
-    // the marble must have available moves
+    if (this.selctedMarble !== EMPTY_MARBLE) {
+      const move = this.moves.find(
+        (move) => move.to.row === row && move.to.col === col,
+      );
+      if (move != null) {
+        // the selected space is a valid move so make the move
+        const playedMarble = this.board[move.from.row][move.from.col];
+        this.board[move.from.row][move.from.col] = EMPTY_SPACE;
+        this.board[move.target.row][move.target.col] = EMPTY_SPACE;
+        this.board[move.to.row][move.to.col] = playedMarble;
+
+        // this turn is complete
+        this.selctedMarble = EMPTY_MARBLE;
+        this.moves = [];
+        return true;
+      }
+      return false;
+    }
+
+    if (this.board[row][col] === EMPTY_SPACE) return false;
+
     this.moves = this.availableMoves(row, col);
-    if (this.moves.length === 0) return false;
+    if (this.moves.length === 0) {
+      // the marble must have available moves
+      this.moves = [];
+      return false;
+    }
 
-    // not in the middle of a move so set the selected marble
-    this.selctedMarble = { row, col };
+    if (this.selctedMarble === EMPTY_MARBLE) {
+      // not in the middle of a move so set the selected marble
+      this.selctedMarble = { row, col };
+      return true;
+    }
 
-    return true;
+    if (this.selctedMarble.row === row && this.selctedMarble.col === col) {
+      // the same marble was selected so deselect it
+      this.selctedMarble = EMPTY_MARBLE;
+      return true;
+    }
+
+    return false;
   }
 
-  availableMoves(row: number, col: number): Coordinate[] {
-    const moves: Coordinate[] = [];
+  availableMoves(row: number, col: number): Move[] {
+    const moves: Move[] = [];
     if (this.board[row][col] < 0) return moves;
     // if there is a marble to the left of the current space, and there is an empty space to the left of that, then push the space to the left of current
     if (
@@ -87,7 +126,11 @@ export class MarbleSolitaire {
       this.board[row][col - 1] > 0 &&
       this.board[row][col - 2] === 0
     ) {
-      moves.push({ row, col: col - 2 });
+      moves.push({
+        from: { row, col },
+        target: { row, col: col - 1 },
+        to: { row, col: col - 2 },
+      });
     }
     // if there is a marble to the right of the current space, and there is an empty space to the right of that, then push the space to the right of current
     if (
@@ -95,7 +138,11 @@ export class MarbleSolitaire {
       this.board[row][col + 1] > 0 &&
       this.board[row][col + 2] === 0
     ) {
-      moves.push({ row, col: col + 2 });
+      moves.push({
+        from: { row, col },
+        target: { row, col: col + 1 },
+        to: { row, col: col + 2 },
+      });
     }
     // if there is a marble above the current space, and there is an empty space above that, then push the space above current
     if (
@@ -103,7 +150,11 @@ export class MarbleSolitaire {
       this.board[row - 1][col] > 0 &&
       this.board[row - 2][col] === 0
     ) {
-      moves.push({ row: row - 2, col });
+      moves.push({
+        from: { row, col },
+        target: { row: row - 1, col },
+        to: { row: row - 2, col },
+      });
     }
     // if there is a marble below the current space, and there is an empty space below that, then push the space below current
     if (
@@ -111,8 +162,22 @@ export class MarbleSolitaire {
       this.board[row + 1][col] > 0 &&
       this.board[row + 2][col] === 0
     ) {
-      moves.push({ row: row + 2, col });
+      moves.push({
+        from: { row, col },
+        target: { row: row + 1, col },
+        to: { row: row + 2, col },
+      });
     }
     return moves;
+  }
+
+  isValidSpace(row: number, col: number): boolean {
+    return (
+      row >= 0 &&
+      row < this.board.length &&
+      col >= 0 &&
+      col < this.board[row].length &&
+      this.board[row][col] !== -1
+    );
   }
 }
