@@ -1,12 +1,13 @@
-import { MarbleSolitaire, BoardType } from './marble-solitaire';
-import { MarbleSolitaireComponent } from './MarbleSolitaireComponent';
-import './App.css';
+import React from "react";
+import { MarbleSolitaire, type BoardType } from "./marble-solitaire";
+import { MarbleSolitaireComponent } from "./MarbleSolitaireComponent";
+import "./App.css";
 
-export default function App() {
-  let game = new MarbleSolitaire('European' as BoardType);
+export default function App(): JSX.Element {
+  const game = new MarbleSolitaire("European" as BoardType);
   return (
     <div className="App">
-      <MarbleSolitaireComponent game={ game }/>
+      <MarbleSolitaireComponent game={game} />
     </div>
   );
 }
