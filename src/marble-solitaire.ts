@@ -71,7 +71,23 @@ export class MarbleSolitaire {
     );
   }
 
+  isGameOver(): boolean {
+    // if there are no available moves, then the game is over
+    // if there is only one marble left on the board, then the game is over
+    let movesAvailable = 0;
+    let marbles = 0;
+    for (let row = 0; row < this.board.length; row++) {
+      for (let col = 0; col < this.board[row].length; col++) {
+        movesAvailable += this.availableMoves(row, col).length;
+        marbles += this.board[row][col] > 0 ? 1 : 0;
+      }
+    }
+    return marbles <= 1 || movesAvailable === 0;
+  }
+
   play(row: number, col: number): boolean {
+    if (this.isGameOver()) return false;
+
     if (!this.isValidSpace(row, col)) return false;
 
     if (!this.marbleSelected()) {
@@ -114,7 +130,10 @@ export class MarbleSolitaire {
 
   availableMoves(row: number, col: number): Move[] {
     const moves: Move[] = [];
-    if (this.board[row][col] < 0) return moves;
+
+    // if there's no marble at the given space, then there are no available moves
+    if (this.board[row][col] <= 0) return moves;
+
     // if there is a marble to the left of the current space, and there is an empty space to the left of that, then push the space to the left of current
     if (
       col > 1 &&

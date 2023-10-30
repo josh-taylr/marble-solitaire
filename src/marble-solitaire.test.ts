@@ -225,4 +225,42 @@ describe("MarbleSolitaire", () => {
       });
     });
   });
+  describe("isGameOver", () => {
+    it("should return false if there are available moves", () => {
+      const game = new MarbleSolitaire("European" as BoardType);
+      game.board = [
+        [1, 2, 3],
+        [0, 5, 6],
+        [7, 8, 9],
+      ];
+      expect(game.isGameOver()).toBe(false);
+    });
+    it("should return true if there are no available moves", () => {
+      const game = new MarbleSolitaire("European" as BoardType);
+      game.board = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+      ];
+      expect(game.isGameOver()).toBe(true);
+    });
+    it("should return false if there is more than one marble", () => {
+      const game = new MarbleSolitaire("European" as BoardType);
+      game.board = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+      ];
+      expect(game.isGameOver()).toBe(true);
+    });
+    it("should return true if there is only one marble", () => {
+      const game = new MarbleSolitaire("European" as BoardType);
+      game.board = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 8, 0],
+      ];
+      expect(game.isGameOver()).toBe(true);
+    });
+  });
 });
