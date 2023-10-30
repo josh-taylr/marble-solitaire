@@ -1,0 +1,7 @@
+node_modules/
+build/
+dist/
+*.css
+*.svg
+*.log
+jest.config.js
