@@ -1,6 +1,8 @@
-# Getting Started with Create React App
+# Marble Solitaire in TypeScript
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a web-based implementation of the classic game, Marble Solitaire, built using TypeScript and React. The application offers an interactive user interface to play the game. The project utilizes npm for package management and is designed with a focus on clean, maintainable code. This project was create to hepl me improve my knowledge of TypeScript and React.
+
+Check out an [alpha build](http://marble-solitaire-app.s3-website.eu-west-2.amazonaws.com/).
 
 ## Available Scripts
 
