@@ -2,6 +2,39 @@ import React from "react";
 import { type MarbleSolitaire } from "./marble-solitaire";
 import { BoardView } from "./BoardView";
 
+interface SolverViewProps {
+  game: MarbleSolitaire;
+}
+
+interface SolverViewState {
+  game: MarbleSolitaire;
+  moveList: string;
+}
+
+export class SolverView extends React.Component<
+  SolverViewProps,
+  SolverViewState
+> {
+  constructor(props: SolverViewProps) {
+    super(props);
+    this.state = { game: props.game, moveList: "Nothing" };
+  }
+
+  onClick(): void {
+    const moveList = this.state.game.solve();
+    this.setState({ moveList });
+  }
+
+  render(): JSX.Element {
+    return (
+      <div>
+        <button onClick={this.onClick.bind(this)}>Solve</button>
+        <div>{this.state.moveList}</div>
+      </div>
+    );
+  }
+}
+
 interface MarbleSolitaireProps {
   game: MarbleSolitaire;
 }
@@ -48,6 +81,7 @@ export class MarbleSolitaireComponent extends React.Component<
           colors={this.colorMap}
           onPlay={this.onBoardUpdate.bind(this)}
         />
+        <SolverView game={this.state.game} />
       </div>
     );
   }
