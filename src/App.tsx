@@ -4,7 +4,7 @@ import { MarbleSolitaireComponent } from "./MarbleSolitaireComponent";
 import "./App.css";
 
 export default function App(): JSX.Element {
-  const game = new MarbleSolitaire("European" as BoardType);
+  const game = new MarbleSolitaire("English" as BoardType);
   return (
     <div className="App">
       <MarbleSolitaireComponent game={game} />
