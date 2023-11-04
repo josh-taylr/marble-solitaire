@@ -27,8 +27,8 @@ export class MarbleSolitaire {
   static europeanBoardTemplate = `
     - - a b c - -
     - y d e f z -
-    g h i j k l m
-    n o p x P O N
+    g h i x k l m
+    n o p q P O N
     M L K J I H G
     - Z F E D Y -
     - - C B A - -
@@ -45,9 +45,10 @@ export class MarbleSolitaire {
   `;
 
   static testBoardTemplate = `
-    x x x
-    d  x
-    g h x
+    a b c b
+    e f g h
+    i j k l
+    m n x p
   `;
 
   constructor(type: BoardType) {
@@ -145,18 +146,25 @@ export class MarbleSolitaire {
       );
 
       if (move == null) return false;
-
-      // the selected space is a valid move so make the move
-      const playedMarble = this.board[move.from.row][move.from.col];
-      this.board[move.from.row][move.from.col] = EMPTY_SPACE;
-      this.board[move.target.row][move.target.col] = EMPTY_SPACE;
-      this.board[move.to.row][move.to.col] = playedMarble;
+      this.doMove(move);
 
       // this turn is complete
       this.selctedMarble = EMPTY_MARBLE;
       this.moves = [];
       return true;
     }
+  }
+
+  private undoMove(move: Move): void {
+    this.board[move.from.row][move.from.col] = move.fromId;
+    this.board[move.target.row][move.target.col] = move.targetId;
+    this.board[move.to.row][move.to.col] = EMPTY_SPACE;
+  }
+
+  private doMove(move: Move): void {
+    this.board[move.from.row][move.from.col] = EMPTY_SPACE;
+    this.board[move.target.row][move.target.col] = EMPTY_SPACE;
+    this.board[move.to.row][move.to.col] = move.fromId;
   }
 
   availableMoves(row: number, col: number): Move[] {
@@ -240,75 +248,19 @@ export class MarbleSolitaire {
 
   // solves the board using a brute force algorithm
   solve(): string {
-    // if the game is already over, then there's nothing to solve
-    if (this.isGameOver()) return "No result";
-
-    // find all available moves for this board state
-    const availableMoves: Move[] = this.board.flatMap((_, row) => {
-      return this.board[row].flatMap((_, col) => {
-        return this.availableMoves(row, col);
-      });
-    });
-
-    for (const move of availableMoves) {
-      const result = this.solveWithRecursion(move);
-      if (result !== "No result") return result;
-    }
-
+    const result = this.solveWithRecursion(null);
+    if (result !== "No result") return result;
     return "No result";
-
-    // string of moves like (fromId => targetId), each on a new line
-    // let moves = "Moves:\n";
-    // let currentNode = result;
-    // while (currentNode != null) {
-    //   const move = currentNode.getMove();
-    //   moves = `${move.fromId} => ${move.targetId}\n${moves}`;
-    //   currentNode = currentNode.getParent();
-    // }
-
-    // let currentNode = rootNode;
-    // do {
-    //   // find all available moves for this board state
-    //   const availableMoves: Move[] = this.board.flatMap((_, row) => {
-    //     return this.board[row].flatMap((_, col) => {
-    //       return this.availableMoves(row, col);
-    //     });
-    //   });
-
-    //   currentNode.addChildMoves(availableMoves);
-
-    //   // select the first move
-    //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    //   const moveNode = currentNode.getChildren()[0];
-    //   if (moveNode == null) {
-    //     // undo the current move
-    //     const playedMove = currentNode.getMove();
-    //     this.board[playedMove.from.row][playedMove.from.col] =
-    //       playedMove.fromId;
-    //     this.board[playedMove.target.row][playedMove.target.col] =
-    //       playedMove.targetId;
-    //     this.board[playedMove.to.row][playedMove.to.col] = EMPTY_SPACE;
-    //   } else {
-    //     // make the move
-    //     const move = moveNode.getMove();
-    //     const playedMarble = this.board[move.from.row][move.from.col];
-    //     this.board[move.from.row][move.from.col] = EMPTY_SPACE;
-    //     this.board[move.target.row][move.target.col] = EMPTY_SPACE;
-    //     this.board[move.to.row][move.to.col] = playedMarble;
-    //     // set the current node to the new move
-    //     currentNode = moveNode;
-    //   }
-    // } while (!this.isGameOver() || currentNode !== rootNode);
   }
 
-  solveWithRecursion(move: Move): string {
-    // make the move
-    this.board[move.from.row][move.from.col] = EMPTY_SPACE;
-    this.board[move.target.row][move.target.col] = EMPTY_SPACE;
-    this.board[move.to.row][move.to.col] = move.fromId;
-
-    // if this move won the game, then return the move string
-    if (this.isWin()) return `${move.fromId} => ${move.targetId}`;
+  solveWithRecursion(move: Move | null): string {
+    if (move != null) {
+      this.doMove(move);
+      if (this.isWin()) {
+        this.undoMove(move);
+        return `${move.fromId} => ${move.targetId}`;
+      }
+    }
 
     // find available moves for this new board state and recurse
     const availableMoves: Move[] = this.board.flatMap((_, row) => {
@@ -316,21 +268,23 @@ export class MarbleSolitaire {
         return this.availableMoves(row, col);
       });
     });
-    for (const move of availableMoves) {
-      const result = this.solveWithRecursion(move);
+    for (const nextMove of availableMoves) {
+      const result = this.solveWithRecursion(nextMove);
       if (result !== "No result") {
         // undo the move
-        this.board[move.from.row][move.from.col] = move.fromId;
-        this.board[move.target.row][move.target.col] = move.targetId;
-        this.board[move.to.row][move.to.col] = EMPTY_SPACE;
-        return `${move.fromId} => ${move.targetId}\n${result}`;
+        if (move != null) {
+          this.undoMove(move);
+          return `${move.fromId} => ${move.targetId}\n${result}`;
+        } else {
+          return result;
+        }
       }
     }
 
-    // undo the move
-    this.board[move.from.row][move.from.col] = move.fromId;
-    this.board[move.target.row][move.target.col] = move.targetId;
-    this.board[move.to.row][move.to.col] = EMPTY_SPACE;
+    if (move != null) {
+      // this move did not lead to a win
+      this.undoMove(move);
+    }
 
     return "No result";
   }

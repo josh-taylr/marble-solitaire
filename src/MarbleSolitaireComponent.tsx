@@ -22,14 +22,16 @@ export class SolverView extends React.Component<
 
   onClick(): void {
     const moveList = this.state.game.solve();
-    this.setState({ moveList });
+    const text = moveList;
+
+    this.setState({ moveList: text.concat() });
   }
 
   render(): JSX.Element {
     return (
       <div>
         <button onClick={this.onClick.bind(this)}>Solve</button>
-        <div>{this.state.moveList}</div>
+        <div>{this.state.moveList.split("\n").join(", ")}</div>
       </div>
     );
   }
