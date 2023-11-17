@@ -2,7 +2,7 @@ import React from "react";
 import { type MarbleSolitaire } from "./marble-solitaire";
 import { BoardSpace } from "./BoardSpaceView";
 
-const GRID_SIZE = 40;
+const GRID_SIZE = 48;
 
 interface BoardViewProps {
   game: MarbleSolitaire;
@@ -12,13 +12,13 @@ interface BoardViewProps {
 
 export class BoardView extends React.Component<BoardViewProps> {
   render(): JSX.Element {
-    const intersections: React.ReactElement[] = [];
+    const spaces: React.ReactElement[] = [];
     for (let i = 0; i < this.props.game.size; i++) {
       for (let j = 0; j < this.props.game.size; j++) {
-        intersections.push(
+        spaces.push(
           <BoardSpace
             id={this.props.game.board[i][j]}
-            key={`intersection-${i}-${j}`}
+            key={`space-${i}-${j}`}
             game={this.props.game}
             color={
               this.props.colors.get(this.props.game.board[i][j]) ?? "white"
@@ -38,7 +38,7 @@ export class BoardView extends React.Component<BoardViewProps> {
 
     return (
       <div style={style} id="board">
-        {intersections}
+        {spaces}
       </div>
     );
   }

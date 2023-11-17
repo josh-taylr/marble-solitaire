@@ -77,7 +77,7 @@ export class MarbleSolitaireComponent extends React.Component<
 
   render(): JSX.Element {
     return (
-      <div>
+      <div className="game-container">
         <BoardView
           game={this.state.game}
           colors={this.colorMap}

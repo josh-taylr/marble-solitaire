@@ -10,6 +10,13 @@
 #pass-btn {
 }
 
+.game-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 #board {
   position: relative;
 }
