@@ -16,7 +16,7 @@ jobs:
         key: ${{ runner.os }}-marble-solitaire-app-build-${{ github.run_id }}
         restore-keys: ${{ runner.os }}-marble-solitaire-app-build
     - name: Build Static Site
-      run: npm install && npm run build
+      run: npm install --legacy-peer-deps && npm run build
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
