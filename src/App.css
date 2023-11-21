@@ -17,33 +17,41 @@
   align-items: center;
 }
 
-#board {
-  position: relative;
+.board {
+  width: 520px;
+  height: 520px;
+  margin: 20px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 64px 64px 64px 64px 64px 64px 64px;
+  grid-template-rows: 64px 64px 64px 64px 64px 64px 64px;
+  gap: 12px;
+  border: 25px solid #333;
+}
+
+.empty {
+  background-color: #fff;
 }
 
 .space {
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  position: absolute;
+  border-radius: 32px;
+  font-size: 24px;
+  text-align: center;
+  vertical-align: middle;
   box-sizing: border-box;
+  background-image: radial-gradient(circle at 60% 60%, #eeeeee, #aaaaaa);
 }
 
-.space.even,
-.space.odd,
-.space.marble {
+.marble {
+  border-radius: 32px;
+  font-size: 24px;
+  text-align: center;
+  vertical-align: middle;
+  box-sizing: border-box;
   border: 1px solid #000;
 }
 
-.space.even {
-  background-color: #faedcd;
-}
-
-.space.odd {
-  background-color: #fefae0;
-}
-
-.space.marble {
+.marble.selected {
   background-color: #bc4749;
 }
 

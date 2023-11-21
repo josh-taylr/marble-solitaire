@@ -2,8 +2,6 @@ import React from "react";
 import { type MarbleSolitaire } from "./marble-solitaire";
 import { BoardSpace } from "./BoardSpaceView";
 
-const GRID_SIZE = 48;
-
 interface BoardViewProps {
   game: MarbleSolitaire;
   colors: Map<number, string>;
@@ -25,21 +23,11 @@ export class BoardView extends React.Component<BoardViewProps> {
             }
             coor={{ row: i, col: j }}
             onPlay={this.props.onPlay}
-            grid_size={GRID_SIZE}
           />,
         );
       }
     }
 
-    const style: React.CSSProperties = {
-      width: this.props.game.size * GRID_SIZE,
-      height: this.props.game.size * GRID_SIZE,
-    };
-
-    return (
-      <div style={style} id="board">
-        {spaces}
-      </div>
-    );
+    return <div className="board">{spaces}</div>;
   }
 }
