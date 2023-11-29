@@ -1,3 +1,17 @@
+/* Define default styles and variables */
+:root {
+  --board-size: 19.2em;
+  --gap-size: 0.4em;
+}
+
+/* Styles for larger screens */
+@media (min-width: 768px) {
+  :root {
+    --board-size: 38.4em;
+    --gap-size: 0.8em;
+  }
+}
+
 .App {
   text-align: center;
 }
@@ -5,9 +19,6 @@
 #alerts {
   height: 40px;
   line-height: 40px;
-}
-
-#pass-btn {
 }
 
 .game-container {
@@ -18,15 +29,15 @@
 }
 
 .board {
-  width: 520px;
-  height: 520px;
-  margin: 20px;
-  padding: 12px;
+  width: var(--board-size);
+  height: var(--board-size);
+  margin: 1em auto;
+  padding: var(--gap-size);
   display: grid;
-  grid-template-columns: 64px 64px 64px 64px 64px 64px 64px;
-  grid-template-rows: 64px 64px 64px 64px 64px 64px 64px;
-  gap: 12px;
-  border: 25px solid #333;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: var(--gap-size);
+  border: 1em solid #333;
   background-color: #eee;
 }
 
@@ -35,7 +46,7 @@
 }
 
 .space {
-  border-radius: 32px;
+  border-radius: 50%;
   font-size: 24px;
   text-align: center;
   vertical-align: middle;
@@ -44,7 +55,7 @@
 }
 
 .marble {
-  border-radius: 32px;
+  border-radius: 50%;
   font-size: 24px;
   text-align: center;
   vertical-align: middle;
