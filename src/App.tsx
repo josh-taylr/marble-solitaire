@@ -15,9 +15,8 @@ export default function App(): JSX.Element {
   };
 
   const [boardType, setBoardType] = useState<BoardType>("European");
-  const { board, selectedMarble, changeBoard, play } = useGameProjection(
-    newGameBoard(boardType),
-  );
+  const { board, selectedMarble, moveCount, changeBoard, play, undo } =
+    useGameProjection(newGameBoard(boardType));
 
   useEffect(() => {
     changeBoard(newGameBoard(boardType));
@@ -29,11 +28,19 @@ export default function App(): JSX.Element {
     setBoardType(event.target.value as BoardType);
   };
 
+  const handleReset = (): void => {
+    changeBoard(newGameBoard(boardType));
+  };
+
+  const handleUndo = (): void => {
+    undo();
+  };
+
   return (
     <div className="App">
       <h1>Marble Solitaire</h1>
       <div>
-        <label htmlFor="boardType">Select Board Type:</label>
+        <label htmlFor="boardType">Board Type:</label>
         <select
           id="boardType"
           value={boardType}
@@ -42,8 +49,13 @@ export default function App(): JSX.Element {
           <option value="English">English</option>
           <option value="European">European</option>
         </select>
+        <button onClick={handleReset} disabled={moveCount === 0}>
+          Reset
+        </button>
+        <button onClick={handleUndo} disabled={moveCount === 0}>
+          Undo
+        </button>
       </div>
-      <p>boardType: {boardType}</p>
       <MarbleSolitaireBoard
         gameBoard={board}
         selectedMarble={selectedMarble}
@@ -58,11 +70,13 @@ export default function App(): JSX.Element {
 interface ProjectedGame {
   board: number[][];
   selectedMarble: Coordinate;
+  moveCount: number;
 }
 
 function useGameProjection(initialGame: MarbleSolitaire): ProjectedGame & {
   changeBoard: (board: MarbleSolitaire) => void;
   play: (row: number, col: number) => void;
+  undo: () => void;
 } {
   const [game, setGame] = useState<MarbleSolitaire>(initialGame);
   const [projection, setProjection] = useState<ProjectedGame>(
@@ -80,9 +94,17 @@ function useGameProjection(initialGame: MarbleSolitaire): ProjectedGame & {
       game.play(row, col);
       setProjection(projectGame(game));
     },
+    undo: () => {
+      game.undo();
+      setProjection(projectGame(game));
+    },
   };
 }
 
 function projectGame(game: MarbleSolitaire): ProjectedGame {
-  return { board: game.board, selectedMarble: game.selctedMarble };
+  return {
+    board: game.board,
+    selectedMarble: game.selctedMarble,
+    moveCount: game.moveCount(),
+  };
 }

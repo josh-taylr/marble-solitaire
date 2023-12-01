@@ -23,6 +23,7 @@ export class MarbleSolitaire {
   size: number = 0;
   selctedMarble: Coordinate = EMPTY_MARBLE;
   moves: Move[] = [];
+  history: Move[] = [];
 
   static europeanBoardTemplate = `
     - - a b c - -
@@ -90,6 +91,7 @@ export class MarbleSolitaire {
       }),
     );
     this.size = this.board.length;
+    this.history = [];
   }
 
   isWin(): boolean {
@@ -147,12 +149,26 @@ export class MarbleSolitaire {
 
       if (move == null) return false;
       this.doMove(move);
+      this.history.push(move);
 
       // this turn is complete
       this.selctedMarble = EMPTY_MARBLE;
       this.moves = [];
       return true;
     }
+  }
+
+  moveCount(): number {
+    return this.history.length;
+  }
+
+  undo(): boolean {
+    const lastMove = this.history.pop();
+    if (lastMove == null) return false;
+    this.undoMove(lastMove);
+    this.selctedMarble = EMPTY_MARBLE;
+    this.moves = [];
+    return true;
   }
 
   private undoMove(move: Move): void {
